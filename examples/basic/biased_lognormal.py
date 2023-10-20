@@ -5,6 +5,8 @@ Biased lognormal fields
 This example shows how to compute a biased lognormal field by rescaling the
 *alms* of the matter field with a biased angular power spectrum.
 
+**WARNING**: This model has a major caveat. See below.
+
 """
 
 # %%
@@ -157,10 +159,24 @@ sim_cls = hp.anafast([delta_tot, delta_tot_b],
 
 # plot the unbiased and biased cls
 l = np.arange(lmax+1)
-plt.plot(l, (sim_cls[1]/sim_cls[0])**0.5, "-k", lw=2, label="simulated bias")
-plt.axhline(bias, c="r", ls="-", lw=1, label="bias factor")
-plt.xscale("log")
-plt.xlabel(r"angular mode number $l$")
-plt.ylabel(r"bias factor")
-plt.legend(frameon=False)
+fig, ax = plt.subplots(2, 1, sharex=True, sharey=True, layout="constrained")
+ax[0].plot(l, (sim_cls[1]/sim_cls[0])**0.5, "-k", lw=2, label="simulated bias (biased $\\times$ biased)")
+ax[0].axhline(bias, c="r", ls="-", lw=1, label="bias factor")
+ax[0].legend(frameon=False)
+ax[0].set_ylabel(r"bias factor")
+ax[1].plot(l, sim_cls[2]/sim_cls[0], "-k", lw=2, label="simulated bias (biased $\\times$ unbiased)")
+ax[1].axhline(bias, c="r", ls="-", lw=1, label="bias factor")
+ax[1].legend(frameon=False)
+ax[1].set_ylabel(r"bias factor")
+ax[1].set_xscale("log")
+ax[1].set_xlabel(r"angular mode number $l$")
+ax[1].set_ylim(bias - 0.25, bias + 0.25)
 plt.show()
+
+# %%
+# The results show that the biased lognormal tracer is able to capture the
+# linear bias in the auto-correlation of the biased tracer reasonably well.
+# **However, there is a significant deviation from the linear model in the
+# cross-correlation between biased tracer and unbiased field.**  The biased
+# lognormal tracer model should therefore only be used where this defect is
+# acceptable.
