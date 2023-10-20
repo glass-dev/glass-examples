@@ -17,12 +17,12 @@ other examples without recomputing.
 # Here we define the shells for these examples, and use CAMB to compute the
 # angular matter power spectra for the shell definitions.
 
-import numpy as np
 import camb
 from cosmology import Cosmology
 
-import glass.shells
-import glass.ext.camb
+from glass.shells import distance_grid, tophat_windows
+from glass.ext.camb import matter_cls, camb_tophat_weight
+from glass.user import save_cls
 
 
 # cosmology for the simulation
@@ -41,18 +41,14 @@ pars = camb.set_params(H0=100*h, omch2=Oc*h**2, ombh2=Ob*h**2,
 cosmo = Cosmology.from_camb(pars)
 
 # shells of 200 Mpc in comoving distance spacing
-zb = glass.shells.distance_grid(cosmo, 0., 1., dx=200.)
+zgrid = distance_grid(cosmo, 0., 1., dx=200.)
 
 # uniform matter weight function
 # CAMB requires linear ramp for low redshifts
-ws = glass.shells.tophat_windows(zb, weight=glass.ext.camb.camb_tophat_weight)
+shells = tophat_windows(zgrid, weight=camb_tophat_weight)
 
 # compute angular matter power spectra with CAMB
-cls = glass.ext.camb.matter_cls(pars, lmax, ws)
+cls = matter_cls(pars, lmax, shells)
 
-
-# %%
-# Save
-# ----
-# We save the shell definitions to file, for use in other examples.
-np.save('cls.npy', cls)
+# save the angular power spectra to file, to use in other examples
+save_cls("cls.npz", cls)
