@@ -3,8 +3,8 @@ Galaxy shear
 ============
 
 This example simulates a galaxy catalogue with shears affected by weak lensing,
-combining the :doc:`/basic/plot_density` and :doc:`/basic/plot_lensing` examples
-with generators for the intrinsic galaxy ellipticity and the resulting shear.
+combining the :doc:`/basic/galaxies` and :doc:`/basic/lensing` examples with
+generators for the intrinsic galaxy ellipticity and the resulting shear.
 
 '''
 
@@ -31,6 +31,7 @@ import glass.points
 import glass.shapes
 import glass.lensing
 import glass.galaxies
+import glass.user
 from glass.core.constants import ARCMIN2_SPHERE
 
 
@@ -56,15 +57,18 @@ zb = glass.shells.distance_grid(cosmo, 0., 1., dx=200.)
 ws = glass.shells.tophat_windows(zb)
 
 # load the angular matter power spectra previously computed with CAMB
-cls = np.load('../basic/cls.npy')
+cls = glass.user.load_cls('../basic/cls.npz')
+
+# angular discretisation with 3 correlated shells
+# putting nside here means that the HEALPix pixel window function is applied
+cls = glass.fields.discretized_cls(cls, nside=nside, lmax=lmax, ncorr=3)
 
 # %%
 # Matter
 # ------
 
-# compute Gaussian cls for lognormal fields for 3 correlated shells
-# putting nside here means that the HEALPix pixel window function is applied
-gls = glass.fields.lognormal_gls(cls, nside=nside, lmax=lmax, ncorr=3)
+# compute Gaussian cls for lognormal fields
+gls = glass.fields.lognormal_gls(cls)
 
 # generator for lognormal matter fields
 matter = glass.fields.generate_lognormal(gls, nside, ncorr=3)
@@ -136,7 +140,7 @@ for i, delta_i in enumerate(matter):
 
         # apply the shear fields to the ellipticities
         gal_she = glass.galaxies.galaxy_shear(gal_lon, gal_lat, gal_eps,
-                                            kappa_i, gamm1_i, gamm2_i)
+                                              kappa_i, gamm1_i, gamm2_i)
 
         # map the galaxy shears to a HEALPix map; this is opaque but works
         gal_pix = hp.ang2pix(nside, gal_lon, gal_lat, lonlat=True)
