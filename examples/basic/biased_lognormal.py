@@ -177,6 +177,8 @@ plt.show()
 # The results show that the biased lognormal tracer is able to capture the
 # linear bias in the auto-correlation of the biased tracer reasonably well.
 # **However, there is a significant deviation from the linear model in the
-# cross-correlation between biased tracer and unbiased field.**  The biased
-# lognormal tracer model should therefore only be used where this defect is
-# acceptable.
+# cross-correlation between biased tracer and unbiased field.**  The "defect"
+# in the model is roughly a function of the amplitude of the spectrum, and
+# hence tendentially worse for lower redshifts, higher :math:`sigma_8` values,
+# and higher bias values.  The biased lognormal tracer model should therefore
+# only be used where this defect is acceptable.
