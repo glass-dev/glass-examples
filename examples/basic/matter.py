@@ -26,6 +26,7 @@ from cosmology import Cosmology
 # these are the GLASS imports: matter and random fields
 import glass.shells
 import glass.fields
+import glass.user
 
 
 # cosmology for the simulation
@@ -48,10 +49,13 @@ cosmo = Cosmology.from_camb(pars)
 zb = glass.shells.distance_grid(cosmo, 0., 1., dx=200.)
 
 # load precomputed angular matter power spectra
-cls = np.load('cls.npy')
+cls = glass.user.load_cls('cls.npz')
 
-# compute Gaussian cls for lognormal fields with 3 correlated shells
-gls = glass.fields.lognormal_gls(cls, ncorr=3, nside=nside)
+# angular discretisation with 3 correlated shells
+cls = glass.fields.discretized_cls(cls, nside=nside, ncorr=3)
+
+# compute Gaussian cls for lognormal fields
+gls = glass.fields.lognormal_gls(cls)
 
 # this generator will yield the matter fields in each shell
 matter = glass.fields.generate_lognormal(gls, nside, ncorr=3)

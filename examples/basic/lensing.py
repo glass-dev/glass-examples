@@ -36,6 +36,7 @@ import glass.shells
 import glass.fields
 import glass.lensing
 import glass.galaxies
+import glass.user
 
 
 # cosmology for the simulation
@@ -60,15 +61,18 @@ zb = glass.shells.distance_grid(cosmo, 0., 1., dx=200.)
 ws = glass.shells.tophat_windows(zb)
 
 # load the angular matter power spectra previously computed with CAMB
-cls = np.load('cls.npy')
+cls = glass.user.load_cls('cls.npz')
+
+# angular discretisation with 3 correlated shells
+# putting nside here means that the HEALPix pixel window function is applied
+cls = glass.fields.discretized_cls(cls, nside=nside, lmax=lmax, ncorr=3)
 
 # %%
 # Matter
 # ------
 
-# compute Gaussian cls for lognormal fields for 3 correlated shells
-# putting nside here means that the HEALPix pixel window function is applied
-gls = glass.fields.lognormal_gls(cls, nside=nside, lmax=lmax, ncorr=3)
+# compute Gaussian cls for lognormal fields
+gls = glass.fields.lognormal_gls(cls)
 
 # generator for lognormal matter fields
 matter = glass.fields.generate_lognormal(gls, nside, ncorr=3)

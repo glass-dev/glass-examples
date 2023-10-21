@@ -2,9 +2,9 @@
 Stage IV Galaxy Survey
 ======================
 
-This example simulates a galaxy catalogue from a Stage IV Space Satellite Galaxy
-Survey such as *Euclid* and *Roman* combining the :doc:`/basic/plot_density` and
-:doc:`/basic/plot_lensing` examples with galaxy ellipticities and galaxy shears,
+This example simulates a galaxy catalogue from a Stage IV Space Satellite
+Galaxy Survey such as *Euclid* and *Roman* combining the :doc:`/basic/galaxies`
+and :doc:`/basic/lensing` examples with galaxy ellipticities and galaxy shears,
 as well as using some auxiliary functions.
 
 The focus in this example is mock catalogue generation using auxiliary functions
@@ -71,9 +71,12 @@ ws = glass.shells.tophat_windows(zb)
 # compute the angular matter power spectra of the shells with CAMB
 cls = glass.ext.camb.matter_cls(pars, lmax, ws)
 
-# compute Gaussian cls for lognormal fields for 3 correlated shells
+# angular discretisation with 3 correlated shells
 # putting nside here means that the HEALPix pixel window function is applied
-gls = glass.fields.lognormal_gls(cls, nside=nside, lmax=lmax, ncorr=3)
+cls = glass.fields.discretized_cls(cls, nside=nside, lmax=lmax, ncorr=3)
+
+# compute Gaussian cls for lognormal fields
+gls = glass.fields.lognormal_gls(cls)
 
 # generator for lognormal matter fields
 matter = glass.fields.generate_lognormal(gls, nside, ncorr=3)
